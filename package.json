@@ -10,7 +10,8 @@
     "new": "bash new-slide.sh",
     "export-og": "slidev-workspace export-og",
     "preview": "slidev-workspace preview",
-    "build": "slidev-workspace build"
+    "build": "slidev-workspace build",
+    "postinstall": "node scripts/patch-slidev-workspace.js"
   },
   "dependencies": {
     "slidev-workspace": "^0.9.3"

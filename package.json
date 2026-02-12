@@ -2,6 +2,10 @@
   "name": "slidev-workspace-starter",
   "version": "1.0.0",
   "description": "A workspace for Slidev presentations",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
   "scripts": {
     "new": "bash new-slide.sh",
     "export-og": "slidev-workspace export-og",

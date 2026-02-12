@@ -78,6 +78,36 @@ pnpm dev
 
 Check out the live demo: https://leochiu-a.github.io/slidev-workspace-starter/
 
+## 🚀 Deployment
+
+### Deploy to Netlify
+
+1. Push your code to GitHub
+2. Go to [Netlify](https://netlify.com) and import your repository
+3. Netlify will automatically detect the `netlify.toml` configuration
+4. Click "Deploy site"
+
+The build settings are pre-configured in `netlify.toml`:
+- **Build command**: `pnpm install && pnpm build`
+- **Publish directory**: `dist`
+- **Node version**: 20
+
+### Deploy to GitHub Pages
+
+The project includes a GitHub Actions workflow (`.github/workflows/deploy.yml`) that automatically deploys to GitHub Pages when you push to the `main` branch.
+
+1. Go to your repository's Settings > Pages
+2. Set Source to "GitHub Actions"
+3. Push to `main` branch to trigger deployment
+
+### Deploy to Vercel
+
+The project includes `vercel.json` configuration. Simply:
+
+1. Push your code to GitHub
+2. Import your repository on [Vercel](https://vercel.com)
+3. Deploy
+
 ## 📚 Included Presentations
 
 This workspace contains presentations organized by category:

@@ -1,0 +1,9 @@
+baseUrl: /slidev-workspace-starter
+
+hero:
+  title: FE Sharing Series
+  description: Frontend engineering sharing sessions from 2023~
+
+sidebar:
+  title: "Presentations"
+  githubUrl: "https://github.com/leochiu-a/slidev-workspace"

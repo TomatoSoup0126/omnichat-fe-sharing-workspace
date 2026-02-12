@@ -14,7 +14,8 @@ const patches = [
     replacement: '.sort((a, b) => b.localeCompare(a))',
     description: 'directory sort order'
   },
-  // Patch 2: Add date sorting in UI
+  // Patch 2: Add date sorting 
+  // in UI
   {
     files: [
       path.join(__dirname, '../node_modules/slidev-workspace/src/preview/components/SlideDeck.vue')
@@ -55,6 +56,15 @@ const patches = [
     ...sortedCategories,
   ];`,
     description: 'category reverse sorting'
+  },
+  // Patch 4: Change max-w from 900px to 1024px
+  {
+    files: [
+      path.join(__dirname, '../node_modules/slidev-workspace/src/preview/components/SlideDeck.vue')
+    ],
+    original: 'max-w-[900px]',
+    replacement: 'max-w-[1024px]',
+    description: 'max width to 1024px'
   }
 ];
 

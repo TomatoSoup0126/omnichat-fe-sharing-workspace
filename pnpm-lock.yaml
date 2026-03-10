@@ -136,6 +136,15 @@ importers:
         specifier: latest
         version: 0.25.0
 
+  slides/2026/sharing-20260312:
+    dependencies:
+      '@slidev/cli':
+        specifier: ^0.49.16
+        version: 0.49.29(@babel/parser@7.29.0)(@nuxt/kit@3.20.0)(@types/markdown-it@14.1.2)(@types/node@22.18.13)(@vue/compiler-sfc@3.5.25)(lightningcss@1.30.2)(playwright-chromium@1.56.1)(postcss@8.5.6)(rollup@4.52.5)
+      '@slidev/theme-default':
+        specifier: latest
+        version: 0.25.0
+
 packages:
 
   '@ampproject/remapping@2.3.0':

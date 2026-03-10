@@ -18,7 +18,7 @@
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "no-referrer-when-downgrade"
-    Content-Security-Policy = "frame-ancestors 'self' http://localhost:* https://localhost:* http://127.0.0.1:* https://127.0.0.1:* https://*.netlify.app"
+    Content-Security-Policy = "frame-ancestors 'self' http://localhost:* https://localhost:*"
 
 [[headers]]
   for = "/assets/*"

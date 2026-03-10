@@ -377,8 +377,9 @@ omnichat-fe-sharing-workspace/
 ```
 
 ---
-layout: iframe
-url: https://fe-sharing-workspace.netlify.app/
+layout: image
+image: /workspace-screenshot.png
+backgroundSize: contain
 ---
 
 ---

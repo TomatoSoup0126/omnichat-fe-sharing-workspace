@@ -7,12 +7,12 @@ lineNumbers: false
 drawings:
   persist: false
 transition: slide-left
-title: Sharing 2026.03.12
+title: Galleon & Cursor Cloud Agent
 mdc: true
 monaco: true
 author: Jonathan Tang
 date: 2026.03.12
-info: Galleon 新專案介紹與 Cursor Cloud Agent 使用分享。Keywords - Galleon, Nuxt 4, Admin, 內部系統, Cursor Skills, Cursor Cloud Agent, niffler
+info: Introduction to Galleon internal admin and Cursor Cloud Agent usage. Keywords - Galleon, Nuxt 4, Cursor Cloud Agent, Slidev Workspace
 ---
 
 # Sharing 2026.03.12
@@ -27,6 +27,7 @@ layout: center
 
 - <Link to="part1-galleon" title="Galleon"/>
 - <Link to="part2-cursor-agent" title="Cursor Cloud Agent"/>
+- <Link to="part3-slidev-workspace" title="Slidev Workspace"/>
 
 ---
 routeAlias: part1-galleon
@@ -340,14 +341,45 @@ layout: center
 - 只支援 GitHub、GitLab，不能開新專案，目前只適合既有 repo 迭代
 
 ---
-routeAlias: summary
+routeAlias: part3-slidev-workspace
 layout: center
 ---
 
-# 總結
+# Slidev Workspace
 
-- **主題一**：Galleon 內部管理系統、技術選型與亮點
-- **主題二**：Cursor Cloud Agent 的使用與心得
+---
+layout: center
+---
+
+<img src="/slidev-workspace.png" class="mt-6 max-h-96 object-contain mx-auto" alt="Slidev Workspace README" />
+
+- [leochiu-a/slidev-workspace](https://github.com/leochiu-a/slidev-workspace)
+
+---
+layout: center
+---
+
+# Workspace 檔案結構
+
+```
+omnichat-fe-sharing-workspace/
+├── slidev-workspace.yaml
+├── package.json
+├── pnpm-workspace.yaml
+├── slides/
+│   ├── 2024/ sharing-20240215, 20240502, ...
+│   ├── 2025/ sharing-20250102, 20250327, ...
+│   └── 2026/ sharing-20260312/ 
+│       ├── slides.md
+│       ├── package.json
+│       └── public/
+└── dist/
+```
+
+---
+layout: iframe
+url: https://fe-sharing-workspace.netlify.app/
+---
 
 ---
 layout: center

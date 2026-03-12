@@ -59,10 +59,9 @@ backgroundSize: 80%
 
 # Galleon？
 
-- ~~Dash Admin 這名稱後端使用了~~
-- 財務、AM / CS 用途，和錢有關
-- Niffler 手上拿著 Galleon
 - Galleon = 金加隆
+- 財務、AM / CS 用途，和錢有關
+- ~~Dash Admin 這名稱後端使用了~~
 
 ---
 routeAlias: tech-stack

@@ -6,7 +6,13 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--version"
 
-# SPA fallback for client-side routing
+# SPA fallback for individual Slidev presentations (must come before catch-all)
+[[redirects]]
+  from = "/:year/:slug/*"
+  to = "/:year/:slug/index.html"
+  status = 200
+
+# SPA fallback for the overview page (catch-all)
 [[redirects]]
   from = "/*"
   to = "/index.html"

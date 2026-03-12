@@ -1,22 +1,10 @@
 [build]
-  command = "pnpm install && pnpm build"
+  command = "pnpm install && pnpm build && node scripts/generate-redirects.js"
   publish = "dist"
 
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--version"
-
-# SPA fallback for individual Slidev presentations (must come before catch-all)
-[[redirects]]
-  from = "/:year/:slug/*"
-  to = "/:year/:slug/index.html"
-  status = 200
-
-# SPA fallback for the overview page (catch-all)
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
 
 # Optional: set custom headers for better performance
 [[headers]]

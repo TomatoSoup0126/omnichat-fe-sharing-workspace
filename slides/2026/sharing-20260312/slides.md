@@ -89,9 +89,13 @@ layout: center
 
 - Vue ecosystem — 大家熟悉的 Vue
 - Nuxt 4 — 開箱即用的一致架構，降低上手與學習成本
-- 選用關鍵：
+- 其他特色：
   - file based routing
-  - auto import components, composables, helper functions and Vue APIs
+  - auto import：
+    - components
+    - composables
+    - helper functions
+    - Vue APIs
 
 ---
 routeAlias: structure
@@ -127,7 +131,7 @@ layout: center
 # 其他
 
 - <Link to="cursor-skills" title="Cursor Skills"/>
-- <Link to="ssr-false" title="Client Side Render"/>
+- <Link to="ssr-false" title="Rendering mode"/>
 
 ---
 routeAlias: cursor-skills
@@ -150,13 +154,13 @@ routeAlias: ssr-false
 layout: center
 ---
 
-# Client Side Render
+# Rendering mode
 
 - Nuxt 的渲染模式可以分為
   - Server Side Render
   - Client Side Render
   - Hybrid Render
-- Galleon 使用 Nuxt 4 的 Client Side Rendering 模式，即 `SSR: false`
+- Galleon 使用 Nuxt 4 的 Client Side Rendering，即 `SSR: false`
 - build 使用 nuxt generate 指令，生成靜態檔案，相當於 Vue SPA
 
 ---
@@ -223,7 +227,7 @@ layout: center
 # 前情提要 - 3
 
 - 回老家後沒帶電腦但又想加功能
-- 使用 Cursor Cloud Agent 來完成
+- 使用 Cursor Cloud Agent 來進行開發
 
 ---
 routeAlias: cursor-agent-what

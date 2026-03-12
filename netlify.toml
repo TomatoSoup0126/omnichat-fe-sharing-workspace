@@ -18,7 +18,6 @@
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "no-referrer-when-downgrade"
-    Content-Security-Policy = "frame-ancestors 'self' http://localhost:* https://localhost:*"
 
 [[headers]]
   for = "/assets/*"

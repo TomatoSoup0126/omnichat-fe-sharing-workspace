@@ -82,149 +82,78 @@ backgroundSize: contain
 </div>
 
 ---
-
-# Context Engineering vs. Harness Engineering
-
-| | Context Engineering | Harness Engineering |
-|---|---|---|
-| **關注點** | 給模型正確的輸入 | 讓 Agent 可靠地完成任務 |
-| **範圍** | Prompt、RAG、Memory、MCP | 指令 + 工具 + 環境 + 狀態 + 驗證 |
-| **對象** | 單次 LLM 呼叫 | 跨 Session 的 Agent 工作流 |
-| **成功標準** | 模型回答正確 | 功能完整交付且通過驗證 |
-
-<v-click>
-
-<div class="mt-8">
-
-→ Context Engineering 可被視為 Harness 的子集合
-
-</div>
-
-</v-click>
-
----
 layout: center
 ---
 
-# 痛點 1：模型很強，為什麼結果還是不盡人意？
+# 模型能力強 ≠ 執行可靠
 
 ---
 
-# 強模型不等於可靠執行
-
-核心論點：升級更強的模型**不能**解決 Agent 的可靠性問題
-
-<v-clicks>
-
-- SWE-bench Verified 上最強的 coding agent 也只有 ~50-60% 通過率 (2025/12)
-- 真正影響成敗的不是模型能力，而是**環境**
-
-</v-clicks>
-
----
-
-# Anthropic 的對照實驗
+# 千里馬與馬鞍的迷思
 
 同一個模型 (Opus 4.5)，同一個任務 (2D 復古遊戲製作器)：
 
-| | 裸環境 | 完整 Harness |
+| | 裸跑（無 Harness） | 完整 Harness |
 |---|---|---|
-| 時間 | 20 分鐘 | 6 小時 |
-| 費用 | $9 | $200 |
+| 投入 | 20 分鐘 / $9 | 6 小時 / $200 |
 | 結果 | 核心功能壞掉 | 完整可玩的遊戲 |
 
 <v-click>
 
-→ 模型沒變，改變的是環境
+→ 模型沒變，改變的是**馬鞍**
 
 </v-click>
 
 ---
 
-# Agent 的五大困難
+# 什麼是 Harness？
 
-<v-clicks>
-
-1. **任務定義不清** — 模糊指令迫使 Agent 猜測
-2. **未文件化的潛規則** — Agent 看不到的規則（e.g. 只存在於 Slack 對話串裡的細節）
-3. **不完整的執行環境** — 缺少相依套件、版本不對
-4. **沒有驗證機制** — 沒有測試或 lint 來確認正確性
-5. **長任務的「上下文焦慮」** — Context window 逼近上限時，Agent 會傾向過早收斂，導致失敗率急遽上升
-
-</v-clicks>
-
----
-
-# Harness 的五子系統
-
-Harness **不只是**一個 prompt 檔案，而是模型權重以外的一切
-
-<v-clicks>
-
-1. **Instruction (食譜架)** — AGENTS.md / CLAUDE.md：專案概覽、技術堆疊、硬性規範
-2. **Tool (刀具架)** — 足夠的工具存取權限
-3. **Environment (爐具)** — 自描述環境：package.json、.nvmrc、tsconfig.json
-4. **State (備料台)** — PROGRESS.md 追蹤已完成 / 進行中 / 阻塞的工作
-5. **Feedback (品檢窗口)** — 明確的驗證指令：vitest、tsc、eslint、pnpm check
-
-</v-clicks>
-
----
-
-# 實證：逐步加入子系統的效果
-
-<div class="grid grid-cols-2 gap-8">
-<div>
-
-**案例 1**：Claude Sonnet + FastAPI
-
-| | 沒有 Harness | 加入 AGENTS.md |
-|---|---|---|
-| 上下文浪費 | 40% | 大幅降低 |
-| 結果 | 宣告完成但有錯誤 | 三次嘗試都成功 |
-
-</div>
-<div>
-
-**案例 2**：GPT-4o + React (~20K 行)
-
-| 配置 | 成功率 |
-|---|---|
-| 只有 README | 20% |
-| + AGENTS.md | 60% |
-| + 驗證指令 | 80% |
-| + 進度追蹤 | 80-100% |
-
-</div>
-</div>
+不是單純的「提示詞 (Prompt)」，而是**模型權重之外的一切工程基礎設施**
 
 <v-click>
 
-→ 模型始終不變 — 所有改善都來自 Harness
+就像一間餐廳 — 模型是食材，Harness 是整套廚房系統：
 
 </v-click>
+
+<v-clicks>
+
+| 餐廳比喻 | Harness 子系統 | 說明 |
+|---|---|---|
+| 菜譜 | **Instruction** | AGENTS.md / CLAUDE.md — 規範與架構 |
+| 刀具 | **Tool** | 工具存取權限 |
+| 灶台 | **Environment** | 自描述環境：package.json、tsconfig |
+| 備菜台 | **State** | PROGRESS.md — 追蹤進度 |
+| 出菜檢查口 | **Feedback** | 驗證指令：vitest、tsc、eslint |
+
+</v-clicks>
 
 ---
 layout: center
 ---
 
-# 痛點 2：Agent 花 40% 時間在探索 repo，效率超低
+# 資訊與上下文管理
+
+## 拒絕把 Token 浪費在「猜測」上
 
 ---
 
-# Repo 是唯一真相來源
+# 專案儲存庫是唯一的可靠資訊來源
 
-→ 不在 repo 裡的資訊，對 Agent 來說就是不存在的
+Agent 看不到 Slack、Jira 或工程師腦袋裡的資訊
 
-Agent 無法存取 Slack、Jira、Notion 或任何人腦中的隱藏知識
+<v-clicks>
+
+- 所有架構決策與硬性規範 → 必須寫入儲存庫（例如 AGENTS.md）
+- **不在儲存庫裡的知識，對 Agent 來說等於不存在**
+
+</v-clicks>
 
 ---
 
 # Cold-Start Test
 
-一個全新的 Agent session，僅靠 repo 內容能回答這五個問題嗎？
-
-<v-clicks>
+一個全新 Agent session，僅靠 repo 能回答這五個問題嗎？
 
 1. 這個系統是什麼？
 2. 它是怎麼組織的？
@@ -232,318 +161,153 @@ Agent 無法存取 Slack、Jira、Notion 或任何人腦中的隱藏知識
 4. 怎麼驗證？
 5. 目前的進度？
 
-</v-clicks>
-
 <v-click>
 
-→ 答不出來 → 知識盲區 → 更高的失敗率
+→ 答不出來 = 知識盲區 = 更高的失敗率
 
 </v-click>
 
 ---
 
-# 建議的 Repo 結構
-
-```
-project/
-├── AGENTS.md          # 入口檔 (50-100 行)
-├── ARCHITECTURE.md    # 每個模組一份
-├── CONSTRAINTS.md     # 硬性約束
-├── PROGRESS.md        # 當前進度
-├── Makefile           # 驗證指令
-└── docs/              # 主題文件
-```
-
-<v-click>
-
-四個原則：知識放在程式碼旁邊、標準化入口檔、最小但完整、文件隨程式碼一起更新
-
-</v-click>
-
----
-
-# 「巨型指令檔」的陷阱
+# 對抗「中間迷失」
 
 Agent 犯錯 → 加一條規則 → 指令檔從 50 行膨脹到 600+ 行
 
 <v-clicks>
 
-- **Context 預算消耗** — 600 行 = 10-20K tokens（佔 200K window 的 5-10%）
-- **Lost in the Middle 效應** — LLM 處理開頭/結尾遠優於中間內容
-- **優先級不明** — Agent 無法區分硬性約束和軟性建議
+- **Context 預算消耗** — 600 行 ≈ 10-20K tokens（佔 200K window 的 5-10%）
+- **Lost in the Middle** — LLM 處理開頭 / 結尾的表現遠優於中間內容
+- **優先級不明** — Agent 無法區分硬性規範 vs. 軟性建議
 - **矛盾累積** — 新舊規則互相衝突
 
 </v-clicks>
 
+<v-click>
+
+**解法：漸進式揭露**
+→ AGENTS.md（50-200 行）連結到主題文件（testing-guidelines.md, api-conventions.md...）
+
+</v-click>
+
 ---
 
-# 解法：漸進式揭露架構
+# 三層終止校驗
+
+把「完成」的判定權交給 Harness 外部系統，而非讓 Agent 自己說了算
+
+<v-clicks>
+
+1. **語法靜態檢查** — lint、type check
+2. **運行時行為驗證** — unit test、integration test
+3. **端到端系統測試** — 完整流程 E2E
+
+</v-clicks>
+
+<v-click>
+
+→ 核心功能驗證通過之前，**禁止重構**（功能正確性 → 效能 → 風格）
+
+</v-click>
+
+---
+
+# 端到端測試的必要性
+
+Unit test 的盲區：mock 隱藏了真正的跨組件問題
+
+<v-clicks>
+
+- **介面不匹配** — 元件間資料格式不相容
+- **狀態傳播錯誤** — 跨層的不一致
+- **資源生命週期** — 跨元件的 subscription / event listener
+- **環境依賴** — mock 環境通過，真實環境失敗
+
+</v-clicks>
+
+<v-click>
+
+→ 加入 E2E 不僅能**抓錯**，還能改變 Agent **遵守架構邊界**的行為
+
+</v-click>
+
+---
+
+# 明確的錯誤訊息
+
+<div class="grid grid-cols-2 gap-8 mt-8">
+<div>
+
+**差的錯誤訊息**
 
 ```
-AGENTS.md (50-200 行，路由器)
-├── 專案概覽
-├── 首次執行指令
-├── 最多 15 條全域硬性約束
-└── 連結到主題文件 ↓
-
-docs/
-├── testing-guidelines.md (50-150 行)
-├── api-conventions.md
-├── security-requirements.md
-└── ...
+Error: assertion failed
+Exit code: 1
 ```
 
-<v-click>
+Agent 只能**盲目重試**
 
-**實際案例**：SaaS 團隊重構 600 行 AGENTS.md → 80 行路由器 + 主題文件
-- 任務成功率：45% → 72%
-- 安全合規率：60% → 95%
+</div>
+<div>
 
-</v-click>
+**好的錯誤訊息**
 
----
-layout: center
----
-
-# 痛點 3：同時碰 5 個功能，沒有一個完整的
-
----
-
-# Agent 傾向同時啟動多個任務
-
-<v-clicks>
-
-- **Overreach**：啟動太多任務
-- **Under-finish**：已啟動 vs. 已驗證完成的比率太低
-- 兩者是共生的 — 解決一個就解決另一個
-- **Little's Law**：高 WIP → 每個任務的 lead time 增加
-
-</v-clicks>
-
-<v-click>
-
-→ 使用 WIP=1 策略的 Agent，任務完成率高出 37%
-
-</v-click>
-
----
-
-# 實際案例：REST API 8 個功能
-
-| | Buffet Mode (無約束) | Single-Plate Mode (WIP=1) |
-|---|---|---|
-| 同時啟動 | 5 個功能 | 1 個功能 |
-| 程式碼量 | 800 行 / 12 檔案 | 200 行 / 4 檔案 |
-| E2E 通過率 | 20% | 100% |
-| 功能完成率 | 37.5% | 87.5% |
-
-<v-click>
-
-→ 「做少但做完」永遠優於「做多但做一半」
-
-</v-click>
-
----
-
-# Feature List 作為基礎資料結構
-
-每個 feature 需要三重結構：
-
-```json
-{
-  "id": "F-001",
-  "behavior": "POST /users returns 201 with valid payload",
-  "verification": "curl -s -o /dev/null -w '%{http_code}' -X POST ...",
-  "state": "not_started",
-  "evidence": null
-}
+```
+Error: POST /users returned 500
+Expected: 201
+Check: database migration
+  has not been applied
+Fix: run `pnpm db:migrate`
 ```
 
-<v-clicks>
+Agent 能**精準修復**
 
-**四個狀態**：`not_started` → `active` → `passing` / `blocked`
-
-**關鍵規則**：Agent **不能**直接改變狀態 — 必須透過驗證指令的執行結果來推進
-
-</v-clicks>
-
----
-layout: center
----
-
-# 痛點 4：Agent 說做完了，一測就炸
-
----
-
-# Agent 過早宣告完成
-
-關鍵失敗模式：Agent 經常**過早宣告任務完成**
+</div>
+</div>
 
 <v-click>
 
-例：密碼重設功能 — unit test 通過，但 email service 設定缺失、migration 失敗、E2E 流程從未測試
+→ 給予明確的修復指導，而非只丟出報錯
 
 </v-click>
 
 ---
 
-# 三個致命陷阱
+# 雙層可觀測性
+
+給 Agent 裝上儀表板
 
 <v-clicks>
 
-1. **Unit test 通過 ≠ 任務完成** — mock 隱藏了介面不匹配、狀態傳播錯誤、環境依賴
-2. **「順便重構」毒害完成度判斷** — 改動了已驗證與未驗證程式碼的邊界
-3. **系統性的自我評估偏差** — 同一個模型生成又評估，容易偏袒自己
+- **系統層** — log、trace、health check
+  - 告訴你「系統做了什麼」
 
-</v-clicks>
-
----
-
-# 三層終止驗證
-
-<v-clicks>
-
-1. **語法/靜態分析** — lint、type check
-2. **執行時行為驗證** — unit test、integration test
-3. **系統級 E2E 確認** — 完整流程測試
+- **流程層** — Sprint Contract、客觀評分標準
+  - 告訴你「為什麼這個變更應該被接受」
+  - 避免 Agent 在錯誤方向上**盲目重試**
 
 </v-clicks>
 
 <v-click>
 
-→ 核心功能驗證通過之前，禁止重構（功能正確性 → 效能 → 風格）
+→ 沒有可觀測性 = 在黑暗中除錯
 
 </v-click>
 
 ---
 
-# Unit Test 抓不到的四類問題
+# 每次會話的清潔交接
+
+「以後再清理」= **永遠不清理**
 
 <v-clicks>
 
-1. **介面不匹配** — 元件之間的資料格式不相容
-2. **狀態傳播錯誤** — 跨層的不一致
-3. **資源生命週期問題** — 跨元件的 subscription、event listener
-4. **環境依賴** — mock 環境通過，真實環境失敗
-
-</v-clicks>
-
-<v-click>
-
-→ 架構規則必須是可執行的，不能只是寫在文件裡
-
-</v-click>
-
----
-layout: center
----
-
-# 痛點 5：新 Session 打開，之前做的事全忘了
-
----
-
-# 資訊流失的問題
-
-<v-clicks>
-
-- **摘要壓縮**保留了「做了什麼」，但失去了「為什麼這樣做」
-- 下個 session 看到結果，卻不理解決策背景，可能撤銷刻意的最佳化
-- **Context Anxiety**：Anthropic 研究顯示 Agent 在接近 context 上限時會「過早收斂」 — 倉促、跳過驗證、選擇次佳方案
-
-</v-clicks>
-
----
-
-# 四個連續性工具
-
-<v-clicks>
-
-1. **PROGRESS.md** — 當前 commit hash、測試/lint 狀態、已完成/進行中/阻塞的任務、已知問題、下一步
-2. **DECISIONS.md** — 架構選擇的理由、被拒絕的替代方案、約束條件
-3. **Git commits 作為 checkpoint** — 原子化工作單元 + 解釋性 commit message
-4. **Session 日常流程**
-   - Clock-in：讀取進度/決策、跑驗證、從 next steps 繼續
-   - Clock-out：更新進度、驗證、commit
-
-</v-clicks>
-
----
-
-# 實際效果
-
-Blog 系統，12 個功能，~5 個 session：
-
-| | 沒有 Journal | 有 Journal |
-|---|---|---|
-| 功能完成 | 7/12 (58%) | 12/12 (100%) |
-| 缺陷率 | 43% | 8% |
-| 重建時間 | — | 減少 78% |
-
-<v-click>
-
-→ 把 Agent 當成有失憶症的天才工程師：下班前一定要記錄做了什麼、為什麼、下一步做什麼
-
-</v-click>
-
----
-
-# Bootstrap Contract — 初始化是獨立階段
-
-第一個 session 的產出：**零業務功能**，只確認四件事
-
-<v-clicks>
-
-- **Can start** — 環境可運作
-- **Can test** — 至少一個測試通過
-- **Can see progress** — 狀態有文件記錄
-- **Can pick up next steps** — 任務拆解存在
-
-</v-clicks>
-
-<v-click>
-
-→ 有獨立初始化階段的專案，多 Session 場景下功能完成率高出 31%
-
-</v-click>
-
----
-layout: center
----
-
-# 痛點 6：專案做三個月，啟動從 5 分鐘變 60 分鐘
-
----
-
-# 兩個層次的可觀測性
-
-<v-clicks>
-
-- **Runtime Observability** — 系統層信號（log、trace、process event、health check）
-  - 「系統做了什麼」
-- **Process Observability** — Harness 決策產物（計畫、評分標準、驗收條件）
-  - 「為什麼這個變更應該被接受」
-
-</v-clicks>
-
-<v-click>
-
-→ 沒有可觀測性，Agent 在不確定中做決策，重試變成盲目摸索
-
-</v-click>
-
----
-
-# Clean State 的五個條件
-
-每次 Session 結束都要保持乾淨：「晚點再清」= 永遠不清
-
-<v-clicks>
+會話結束前的五項檢查：
 
 1. **Build 通過**
-2. **Tests 通過**（包含既有測試）
+2. **Tests 通過**（含既有測試）
 3. **進度已記錄**（machine-readable artifact）
-4. **沒有殘留物**（debug log、temp file、註解掉的程式碼、TODO marker）
-5. **啟動路徑可用**（下個 session 不需要人工介入）
+4. **清理臨時工件**（debug log、temp file、註解程式碼）
+5. **啟動路徑可用**（下個 session 不需人工介入）
 
 </v-clicks>
 
@@ -551,9 +315,9 @@ layout: center
 
 # 不清理的代價
 
-沒有 cleanup 策略的 12 週專案退化曲線：
+12 週專案退化曲線：
 
-| | Week 1 | Week 12 (無 cleanup) | Week 12 (有 cleanup) |
+| | Week 1 | Week 12（無 cleanup） | Week 12（有 cleanup） |
 |---|---|---|---|
 | Build 通過率 | 100% | 68% | 97% |
 | Test 通過率 | 100% | 61% | 95% |
@@ -561,7 +325,7 @@ layout: center
 
 <v-click>
 
-→ 熵增是預設行為 — 不主動維護，品質一定下降
+→ 熵增是預設行為 — 不主動維護，品質一定下降。技術債會指數級累積，拖垮下一個會話
 
 </v-click>
 
@@ -573,37 +337,27 @@ layout: center
 
 ---
 
-# 六個痛點，六組解法
+# 兩大主題，完整 Harness
 
-<div class="grid grid-cols-2 gap-4 text-sm">
+<div class="grid grid-cols-2 gap-8">
 <div>
 
-**1. 結果不可靠**
-- Harness = 模型權重以外的一切
-- 五子系統：指令、工具、環境、狀態、驗證
+**一、模型能力強 ≠ 執行可靠**
 
-**2. Agent 在瞎猜**
-- Repo 是唯一真相來源
-- 指令要拆分，不要膨脹
-
-**3. 做太多做不完**
-- WIP=1，做少做完
-- Feature List 是基礎元件
+- 同一模型，Harness 決定成敗
+- Harness = 指令 + 工具 + 環境 + 狀態 + 回饋
+- 不是 Prompt，是完整的廚房系統
 
 </div>
 <div>
 
-**4. 說完成但沒完成**
-- 外部化完成判斷
-- E2E 測試是真正的驗證
+**二、資訊與上下文管理**
 
-**5. 跨 Session 失憶**
-- 連續性工具 + Session 日常流程
-- 初始化是獨立階段
-
-**6. 長期退化**
-- 可觀測性是核心架構屬性
-- 每次 Session 都要 clean state
+- Repo 是唯一真相來源
+- 指令要拆分，不要膨脹
+- 三層終止校驗 + E2E 測試
+- 雙層可觀測性
+- 每次會話都要 Clean State
 
 </div>
 </div>

@@ -148,12 +148,6 @@ layout: center
 
 不是單純的「提示詞 (Prompt)」，而是模型之外的工程基礎設施
 
-<v-click>
-
-就像一間餐廳 — 模型是食材，Harness 是整套廚房系統：
-
-</v-click>
-
 <v-clicks>
 
 | 餐廳比喻 | Harness 子系統 | 說明 |
@@ -209,8 +203,8 @@ Agent 看不到 Slack、Jira 或工程師腦袋裡的資訊
 
 <v-clicks>
 
-- 所有架構決策與硬性規範 → 必須寫入儲存庫（例如 AGENTS.md）
 - 不在儲存庫裡的知識，對 Agent 來說等於不存在
+- 所有架構決策與硬性規範 → 必須寫入儲存庫（例如 AGENTS.md）
 
 </v-clicks>
 
@@ -221,10 +215,10 @@ Agent 看不到 Slack、Jira 或工程師腦袋裡的資訊
 一個全新 Agent session，僅靠 repo 能回答這五個問題嗎？
 
 1. 這個系統是什麼？
-2. 它是怎麼組織的？
-3. 怎麼跑起來？
-4. 怎麼驗證？
-5. 目前的進度？
+2. 它的架構是什麼？
+3. 怎麼如何執行？
+4. 如何驗證？
+5. 目前的開發進度？
 
 <v-click>
 
@@ -249,7 +243,7 @@ Agent 看不到 Slack、Jira 或工程師腦袋裡的資訊
 <!-- 工作時的規則：如不要改動某些檔案、不要使用某些工具 -->
 
 # Hard Constraints
-<!-- 硬性規則：如認證方式、API 模式、表單驗證 -->
+<!-- 硬性規範：如認證方式、API 模式、表單驗證 -->
 
 # Definition of Done
 <!-- 完成任務的標準：如無錯誤、型別檢查通過、測試通過、UI 驗證通過、無未預期的副作用 -->
@@ -303,9 +297,9 @@ layout: center
 
 <v-clicks>
 
-1. **語法靜態檢查** — lint、type check
-2. **運行時行為驗證** — unit test、integration test
-3. **E2E 系統測試** — 完整流程測試
+- **語法靜態檢查** — lint、type check
+- **運行時行為驗證** — unit test、integration test
+- **E2E 系統測試** — 完整流程測試
 
 </v-clicks>
 
@@ -317,7 +311,7 @@ layout: center
 
 ---
 
-# 雙層可觀測性
+# 雙重可觀測性
 
 給 Agent 裝上儀表板
 
@@ -327,7 +321,7 @@ layout: center
   - 告訴它「系統發生了什麼事」
 
 - **流程層** — **PROGRESS.md**：當前進度、已完成/進行中/阻塞的任務、驗收條件
-  - 告訴它「為什麼這個任務應該要被完成」
+  - 告訴它「為什麼這個任務應該要被完成、如何完成」
   - 避免 Agent 在錯誤方向上盲目重試
 
 </v-clicks>
@@ -346,7 +340,7 @@ layout: center
 - **Tests 通過**（含既有測試）
 - **進度已記錄**（machine-readable artifact）
 - **清理臨時檔案 / 程式碼**（debug log、temp file、註解程式碼）
-- **啟動路徑可用**（下個 session 不需人工介入）
+- **專案可順利啟動**（下個 session 不需人工介入）
 
 </v-clicks>
 
@@ -392,8 +386,9 @@ layout: center
 
 **Token 和時間如何有效利用**
 
-- Repo 是唯一真相來源
-- AGENTS.md 消除探索浪費
+- 儲存庫是唯一真相來源
+- 用 AGENTS.md 消除探索浪費
+- 試圖減少 LLM 的上下文焦慮
 - 指令要拆分，不要膨脹
 
 </div>
@@ -402,7 +397,7 @@ layout: center
 **Agent 說做完了，一測就炸**
 
 - 使用 Harness 取代自我評估
-- PROGRESS.md 雙層可觀測性
+- PROGRESS.md 雙重可觀測性
 - 每次會話都要 Clean State
 
 </div>

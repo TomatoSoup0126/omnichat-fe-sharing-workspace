@@ -49,6 +49,17 @@ backgroundSize: contain
 
 ---
 
+<div class="flex items-center justify-center gap-16 mt-16">
+  <div class="text-center">
+    <img src="/harness-engineering-openai.png" class="m-auto h-64 rounded shadow" />
+  </div>
+  <div class="text-center">
+    <img src="/harness-engineering-anthropic.png" class="m-auto h-88 rounded shadow" />
+  </div>
+</div>
+
+---
+
 <div class="flex items-center justify-center gap-8 h-full text-xl">
   <div class="text-center">
     <div class="text-4xl font-bold text-gray-400">2022</div>
@@ -85,22 +96,49 @@ backgroundSize: contain
 layout: center
 ---
 
+# Harness 想解決的問題
+
+<v-clicks>
+
+- 用很強的模型，但結果為何差強人意？
+   <!-- - 模型能力 ≠ 執行可靠性
+   - 缺乏驗證、環境、狀態管理 → 結果不可控 -->
+
+- Token 和時間都是有限的，如何有效利用？
+   <!-- - Agent 花大量 Token 在探索、猜測、重試
+   - 正確的資訊架構能大幅降低浪費 -->
+
+- Agent 說做完了，但一測就炸
+
+</v-clicks>
+
+---
+layout: center
+---
+
+# 千里馬與馬具
+
+千里馬再強，沒有馬具也很難順利騎乘到目的地 — 模型也是一樣
+
+---
+layout: center
+---
+
 # 模型能力強 ≠ 執行可靠
 
 ---
 
-# 千里馬與馬鞍的迷思
+# Harness 的效益
+同一個模型 (Opus 4.5)，執行相同任務 (2D 復古遊戲開發)
 
-同一個模型 (Opus 4.5)，同一個任務 (2D 復古遊戲製作器)：
-
-| | 裸跑（無 Harness） | 完整 Harness |
+| | 無 Harness | 完整 Harness |
 |---|---|---|
 | 投入 | 20 分鐘 / $9 | 6 小時 / $200 |
 | 結果 | 核心功能壞掉 | 完整可玩的遊戲 |
 
 <v-click>
 
-→ 模型沒變，改變的是**馬鞍**
+→ 模型不變，改變的是 Harness
 
 </v-click>
 
@@ -108,7 +146,7 @@ layout: center
 
 # 什麼是 Harness？
 
-不是單純的「提示詞 (Prompt)」，而是**模型權重之外的一切工程基礎設施**
+不是單純的「提示詞 (Prompt)」，而是模型之外的工程基礎設施
 
 <v-click>
 
@@ -120,11 +158,11 @@ layout: center
 
 | 餐廳比喻 | Harness 子系統 | 說明 |
 |---|---|---|
-| 菜譜 | **Instruction** | AGENTS.md / CLAUDE.md — 規範與架構 |
-| 刀具 | **Tool** | 工具存取權限 |
-| 灶台 | **Environment** | 自描述環境：package.json、tsconfig |
-| 備菜台 | **State** | PROGRESS.md — 追蹤進度 |
-| 出菜檢查口 | **Feedback** | 驗證指令：vitest、tsc、eslint |
+| 食譜 | **指令** | AGENTS.md / CLAUDE.md — 規範與架構 |
+| 廚具 | **工具** | 工具存取權限 |
+| 爐子 | **環境** | 環境描述檔：package.json、tsconfig |
+| 備料台 | **狀態** | PROGRESS.md — 追蹤進度 |
+| 出餐口 | **驗證** | 驗證指令：vitest、eslint |
 
 </v-clicks>
 
@@ -133,8 +171,35 @@ layout: center
 ---
 
 # 資訊與上下文管理
+減少把 Token 用在「猜測」和「探索」上
 
-## 拒絕把 Token 浪費在「猜測」上
+<v-clicks>
+
+「 讓我先看看這專案的結構 」
+
+「 再讓我深入了解這些檔案 」
+
+</v-clicks>
+
+---
+
+# 上下文焦慮 (Context Anxiety)
+
+當 context window 逼近上限時，Agent 的行為會改變
+
+<v-clicks>
+
+- **過早收斂** — 倉促給出答案，跳過驗證步驟
+- **選擇次佳方案** — 偏好「能快速結束」的做法，而非正確做法
+- **跳過邊界情況** — 省略測試、忽略 edge case
+
+</v-clicks>
+
+<v-click>
+
+→ Token 浪費在探索上 → context 更快耗盡 → 焦慮更早觸發 → 更早交差
+
+</v-click>
 
 ---
 
@@ -145,7 +210,7 @@ Agent 看不到 Slack、Jira 或工程師腦袋裡的資訊
 <v-clicks>
 
 - 所有架構決策與硬性規範 → 必須寫入儲存庫（例如 AGENTS.md）
-- **不在儲存庫裡的知識，對 Agent 來說等於不存在**
+- 不在儲存庫裡的知識，對 Agent 來說等於不存在
 
 </v-clicks>
 
@@ -163,20 +228,49 @@ Agent 看不到 Slack、Jira 或工程師腦袋裡的資訊
 
 <v-click>
 
-→ 答不出來 = 知識盲區 = 更高的失敗率
+→ 答不出來 / 只能靠猜 = 存在知識盲區 = 更高的失敗率
 
 </v-click>
 
 ---
 
-# 對抗「中間迷失」
+# AGENTS.md
+
+讓 Agent 在第一秒就知道該做什麼、怎麼做、不能做什麼
+
+```markdown
+# 專案概述
+<!-- 一句話說明系統用途 -->
+
+# Startup Workflow
+<!-- 開始工作前的標準流程：安裝依賴套件、檢查環境、確認 git branch -->
+
+# Working Rules
+<!-- 工作時的規則：如不要改動某些檔案、不要使用某些工具 -->
+
+# Hard Constraints
+<!-- 硬性規則：如認證方式、API 模式、表單驗證 -->
+
+# Definition of Done
+<!-- 完成任務的標準：如無錯誤、型別檢查通過、測試通過、UI 驗證通過、無未預期的副作用 -->
+```
+
+<v-click>
+
+→ 200 行就能消除大部分的探索浪費
+
+</v-click>
+
+---
+
+# 日漸膨脹的 AGENTS.md
 
 Agent 犯錯 → 加一條規則 → 指令檔從 50 行膨脹到 600+ 行
 
 <v-clicks>
 
-- **Context 預算消耗** — 600 行 ≈ 10-20K tokens（佔 200K window 的 5-10%）
-- **Lost in the Middle** — LLM 處理開頭 / 結尾的表現遠優於中間內容
+- **Context 消耗** — 600 行 ≈ 10-20K tokens（佔 200K window 的 5-10%）
+- **中間迷失** — LLM 處理開頭 / 結尾的表現遠優於中間內容
 - **優先級不明** — Agent 無法區分硬性規範 vs. 軟性建議
 - **矛盾累積** — 新舊規則互相衝突
 
@@ -185,88 +279,39 @@ Agent 犯錯 → 加一條規則 → 指令檔從 50 行膨脹到 600+ 行
 <v-click>
 
 **解法：漸進式揭露**
-→ AGENTS.md（50-200 行）連結到主題文件（testing-guidelines.md, api-conventions.md...）
+→ AGENTS.md（50-200 行）連結到其餘的主題文件，做更詳細的說明
+- api.md
+- components.md
+- testing-guidelines.md
+- ...
 
 </v-click>
 
 ---
+layout: center
+---
 
-# 三層終止校驗
+# Agent 說做完了，但一測就炸
+
+---
+
+# Agent 對自身有過度樂觀的傾向
 
 把「完成」的判定權交給 Harness 外部系統，而非讓 Agent 自己說了算
+
+在 AGENT.md 中加入驗證規則
 
 <v-clicks>
 
 1. **語法靜態檢查** — lint、type check
 2. **運行時行為驗證** — unit test、integration test
-3. **端到端系統測試** — 完整流程 E2E
+3. **E2E 系統測試** — 完整流程測試
 
 </v-clicks>
 
 <v-click>
 
-→ 核心功能驗證通過之前，**禁止重構**（功能正確性 → 效能 → 風格）
-
-</v-click>
-
----
-
-# 端到端測試的必要性
-
-Unit test 的盲區：mock 隱藏了真正的跨組件問題
-
-<v-clicks>
-
-- **介面不匹配** — 元件間資料格式不相容
-- **狀態傳播錯誤** — 跨層的不一致
-- **資源生命週期** — 跨元件的 subscription / event listener
-- **環境依賴** — mock 環境通過，真實環境失敗
-
-</v-clicks>
-
-<v-click>
-
-→ 加入 E2E 不僅能**抓錯**，還能改變 Agent **遵守架構邊界**的行為
-
-</v-click>
-
----
-
-# 明確的錯誤訊息
-
-<div class="grid grid-cols-2 gap-8 mt-8">
-<div>
-
-**差的錯誤訊息**
-
-```
-Error: assertion failed
-Exit code: 1
-```
-
-Agent 只能**盲目重試**
-
-</div>
-<div>
-
-**好的錯誤訊息**
-
-```
-Error: POST /users returned 500
-Expected: 201
-Check: database migration
-  has not been applied
-Fix: run `pnpm db:migrate`
-```
-
-Agent 能**精準修復**
-
-</div>
-</div>
-
-<v-click>
-
-→ 給予明確的修復指導，而非只丟出報錯
+→ 核心功能驗證通過之前，**禁止重構**（功能正確性 → 效能 → 撰寫風格）
 
 </v-click>
 
@@ -279,35 +324,29 @@ Agent 能**精準修復**
 <v-clicks>
 
 - **系統層** — log、trace、health check
-  - 告訴你「系統做了什麼」
+  - 告訴它「系統發生了什麼事」
 
-- **流程層** — Sprint Contract、客觀評分標準
-  - 告訴你「為什麼這個變更應該被接受」
-  - 避免 Agent 在錯誤方向上**盲目重試**
+- **流程層** — **PROGRESS.md**：當前進度、已完成/進行中/阻塞的任務、驗收條件
+  - 告訴它「為什麼這個任務應該要被完成」
+  - 避免 Agent 在錯誤方向上盲目重試
 
 </v-clicks>
-
-<v-click>
-
-→ 沒有可觀測性 = 在黑暗中除錯
-
-</v-click>
 
 ---
 
 # 每次會話的清潔交接
 
-「以後再清理」= **永遠不清理**
+「以後再清理」= 永遠不清理
 
 <v-clicks>
 
-會話結束前的五項檢查：
+會話結束前的各項檢查：
 
-1. **Build 通過**
-2. **Tests 通過**（含既有測試）
-3. **進度已記錄**（machine-readable artifact）
-4. **清理臨時工件**（debug log、temp file、註解程式碼）
-5. **啟動路徑可用**（下個 session 不需人工介入）
+- **Build 通過**
+- **Tests 通過**（含既有測試）
+- **進度已記錄**（machine-readable artifact）
+- **清理臨時檔案 / 程式碼**（debug log、temp file、註解程式碼）
+- **啟動路徑可用**（下個 session 不需人工介入）
 
 </v-clicks>
 
@@ -336,45 +375,54 @@ layout: center
 # 總結
 
 ---
+layout: center
+---
 
-# 兩大主題，完整 Harness
-
-<div class="grid grid-cols-2 gap-8">
+<div class="grid grid-cols-3 gap-6 text-sm">
 <div>
 
-**一、模型能力強 ≠ 執行可靠**
+**模型能力強 ≠ 執行可靠**
 
 - 同一模型，Harness 決定成敗
-- Harness = 指令 + 工具 + 環境 + 狀態 + 回饋
+- Harness = 指令 + 工具 + 環境 + 狀態 + 驗證
 - 不是 Prompt，是完整的廚房系統
 
 </div>
 <div>
 
-**二、資訊與上下文管理**
+**Token 和時間如何有效利用**
 
 - Repo 是唯一真相來源
+- AGENTS.md 消除探索浪費
 - 指令要拆分，不要膨脹
-- 三層終止校驗 + E2E 測試
-- 雙層可觀測性
+
+</div>
+<div>
+
+**Agent 說做完了，一測就炸**
+
+- 使用 Harness 取代自我評估
+- PROGRESS.md 雙層可觀測性
 - 每次會話都要 Clean State
 
 </div>
 </div>
 
 ---
+
+# 安裝 Harness <a href="https://github.com/walkinglabs/learn-harness-engineering/blob/main/docs/en/resources/templates/index.md" target="_blank" style="text-decoration: none !important; border-bottom: none !important;"><carbon-logo-github class="inline-block text-xl align-middle" /> </a>
+
+<img src="/template-guide.png" class="m-auto mt-16 h-64 rounded shadow" />
+
+---
 layout: center
 ---
 
-# 一句話總結
+# Reference
 
-→ 不要升級模型，先升級 Harness
-
-<v-click>
-
-課程來源：[Learn Harness Engineering](https://walkinglabs.github.io/learn-harness-engineering/en/)
-
-</v-click>
+- [Learn Harness Engineering](https://github.com/walkinglabs/learn-harness-engineering)
+- [Harness engineering: leveraging Codex in an agent-first world](https://openai.com/index/harness-engineering/)
+- [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps)
 
 ---
 layout: center

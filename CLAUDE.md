@@ -33,7 +33,7 @@ Or navigate to the project directory and run `pnpm dev` / `pnpm build` / `pnpm e
 ### Workspace structure
 
 - **pnpm workspaces** with `slides/**` as package glob
-- **pnpm-workspace.yaml** catalogs shared dependency versions (`vue`, `@slidev/cli`, themes)
+- **pnpm-workspace.yaml** defines a `catalog`, but no presentation references it yet — each `package.json` pins its own `@slidev/cli` (currently `^0.49.16`). Changing the catalog alone does not upgrade any presentation.
 - **slidev-workspace.yaml** configures the portal page (hero, sidebar, baseUrl)
 - **postinstall** runs `scripts/patch-slidev-workspace.js` to patch the slidev-workspace package: reverses sort order (newest first), adds date-based sorting, widens max-width to 1024px
 
@@ -42,7 +42,7 @@ Or navigate to the project directory and run `pnpm dev` / `pnpm build` / `pnpm e
 Each presentation lives at `slides/YYYY/sharing-YYYYMMDD/` and contains:
 - `slides.md` — main content with YAML front matter (theme, title, author, date as `YYYY.MM.DD`, info, transition, mdc, monaco)
 - `package.json` — private package with `dev`/`build`/`export` scripts
-- `public/` — static assets (images, videos), referenced with absolute paths like `/YYYYMMDD/image.png`
+- `public/` — static assets (images, videos), referenced with absolute paths from the `public/` root (e.g. `/image.png`). Older presentations nest assets under `/YYYYMMDD/`; recent ones put them at the root. Each presentation builds separately, so file names don't collide across presentations.
 
 ### Deployment
 

@@ -104,7 +104,7 @@ layout: two-cols
 <v-clicks>
 
 - 取自經濟學家 **William Stanley Jevons**
-- **Jevons paradox**（傑文斯悖論）
+- **Jevons paradox**（[傑文斯悖論](https://zh.wikipedia.org/zh-tw/%E5%A8%81%E5%BB%89%C2%B7%E6%96%AF%E5%9D%A6%E5%88%A9%C2%B7%E6%9D%B0%E6%96%87%E6%96%AF#%E6%9D%B0%E6%96%87%E6%96%AF%E5%9B%B0%E5%B1%80)）
   - 1865 年，蒸汽機改良後，燒同樣的煤能做更多事
   - 結果煤的用量不減反增，因為蒸汽機被用到工廠、鐵路、輪船
 - TypeSafe 押注 AI 也會如此發展
@@ -136,7 +136,6 @@ layout: two-cols
   - 「這張票是 bug 修復、新功能還是重構？」
   - 「這個 shell 指令是唯讀的嗎？」
   - 「這個 PR 描述跟 diff 的內容一致嗎？」
-- 回傳的是 JSON，不用再 parse 一段文字
 
 </v-clicks>
 
@@ -152,11 +151,51 @@ layout: two-cols
 
 ---
 
-# Choice：選擇題
+# state / instructions / criteria
 
-```jsonc {all|1-2|5|9|11|12|13|18-19}
+<div class="grid grid-cols-[3fr_2fr] gap-6">
+
+<div>
+
+```jsonc {all|1-2|5|9|10-15}
 // POST https://api.typesafe.ai/v1/systemone
 // Authorization: Bearer $TYPESAFE_API_KEY
+{
+  "model": "jev-latest",
+  "state": { "document": "我被重複扣款兩次，請盡快處理！" },
+  "questions": {
+    "category": {
+      "type": "choice",
+      "instructions": "這張客服單是關於什麼？",
+      "criteria": {
+        "billing": { "what": "扣款、發票、退款或訂閱",
+                     "not_for": "訂單追蹤或帳號登入" },
+        "shipping": { "what": "訂單追蹤與配送" },
+        "other": null
+      }
+    }
+  }
+}
+```
+
+</div>
+
+<div>
+
+- **state**：要被判斷的內容（string、JSON object 或 array），所有題目共用
+- **instructions**：問題本身，保持簡短
+- **criteria**：Choice 的選項、Noul 的 true / false、Score 的刻度
+  - 描述可以是字串，容易混淆時改寫成 object，例如 `{ what, not_for }`
+
+</div>
+
+</div>
+
+---
+
+# Choice：選擇題
+
+```jsonc {all|6|7|8-12|16-17}
 {
   "model": "jev-latest",
   "state": { "document": "我被重複扣款兩次，請盡快處理！" },
@@ -180,21 +219,22 @@ layout: two-cols
 
 # Noul：是非題
 
-```jsonc {all|5|6-11|14}
+```jsonc {all|6|7|8-11|15}
 {
   "model": "jev-latest",
   "state": "我被重複扣款了，請幫忙處理。",
   "questions": {
-    "billing": { "type": "noul", "instructions": "這是跟帳單有關的問題嗎？" },
     "is_repeat_contact": {
       "type": "noul",
       "instructions": "顧客之前是否已經為這件事聯絡過客服？",
-      "criteria": { "true": "提到之前問過、開過單，或已經反映過",
-                    "false": "沒有任何之前聯絡過的跡象" }
+      "criteria": {
+        "true": "提到之前問過、開過單，或已經反映過",
+        "false": "沒有任何之前聯絡過的跡象"
+      }
     }
   }
 }
-// 實測：billing 0.91，is_repeat_contact 0.11
+// 實測：is_repeat_contact 0.11
 ```
 
 <v-clicks>
@@ -208,7 +248,7 @@ layout: two-cols
 
 # Score：量表題
 
-```jsonc {all|7|8-12|16}
+```jsonc {all|6|7|8-12|16}
 {
   "model": "jev-latest",
   "state": "在 Safari 上，設定頁的匯出按鈕點了會讓整頁當掉⋯⋯",
@@ -231,55 +271,6 @@ layout: two-cols
 
 - `score` = Σ level × 機率，是連續值（這裡是 0–2）
 - 每個 level 要描述具體情境，單獨拿出來也看得懂
-- 適合排序：例如每張 bug 回報各問一次嚴重程度，再依分數排
-
-</v-clicks>
-
----
-
-# 在 Claude Code 裡使用
-
-```bash
-# 1. 在 console.typesafe.ai 取得 key，寫進 ~/.zshrc 後重開終端機
-export TYPESAFE_API_KEY=<your-key>
-
-# 2. 安裝官方 plugin
-/plugin marketplace add typesafe-ai/skills
-/plugin install typesafe@typesafe-ai
-
-# 3. 呼叫 skill，或直接說「用 Jev 判斷…」
-/typesafe:typesafe-ai
-```
-
----
-
-# state / instructions / criteria
-
-```jsonc {all|3|7|8-13}
-{
-  "model": "jev-latest",
-  "state": { "document": "我被重複扣款兩次，請盡快處理！" },
-  "questions": {
-    "category": {
-      "type": "choice",
-      "instructions": "這張客服單是關於什麼？",
-      "criteria": {
-        "billing": { "what": "扣款、發票、退款或訂閱",
-                     "not_for": "訂單追蹤或帳號登入" },
-        "shipping": { "what": "訂單追蹤與配送" },
-        "other": null
-      }
-    }
-  }
-}
-```
-
-<v-clicks>
-
-- **state**：要被判斷的內容（string、JSON object 或 array），所有題目共用
-- **instructions**：問題本身，保持簡短
-- **criteria**：Choice 的選項、Noul 的 true / false、Score 的刻度
-  - 描述可以是字串，容易混淆時改寫成 object，例如 `{ what, not_for }`
 
 </v-clicks>
 
@@ -383,6 +374,22 @@ table { margin-bottom: 1rem; }
 </div>
 
 </div>
+
+---
+
+# 在 Claude Code 裡使用
+
+```bash
+# 1. 在 console.typesafe.ai 取得 key，寫進 ~/.zshrc 後重開終端機
+export TYPESAFE_API_KEY=<your-key>
+
+# 2. 安裝官方 plugin
+/plugin marketplace add typesafe-ai/skills
+/plugin install typesafe@typesafe-ai
+
+# 3. 呼叫 skill，或直接說「用 Jev 判斷…」
+/typesafe:typesafe-ai
+```
 
 ---
 routeAlias: part-agentic-cases

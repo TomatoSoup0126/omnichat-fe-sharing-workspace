@@ -54,3 +54,13 @@ Netlify via `netlify.toml`. Build pipeline:
 ### Git conventions
 
 Commit messages use emoji prefixes: `📝` docs, `🧹` chore, `🐛` fix, etc.
+
+## Slide quality checklist
+
+After every slide edit:
+1. Recheck code-highlight line numbers and click-step sequences so they stay consistent with neighboring slides.
+2. Verify no slide overflows or gets cut off (tables, two-column layouts, long text).
+3. Avoid unnecessary bold text.
+4. Check that linked images don't inherit underline styling.
+
+Code examples use HTTP API style (not SDK style) unless told otherwise. Use high-resolution images only. Chinese copy follows the global language rule: Taiwanese Traditional Chinese, no stiff literal translations.

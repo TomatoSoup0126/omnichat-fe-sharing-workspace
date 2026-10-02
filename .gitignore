@@ -6,3 +6,5 @@ dist
 .remote-assets
 components.d.ts
 _gh-pages
+# Claude Code worktrees
+.claude/worktrees/

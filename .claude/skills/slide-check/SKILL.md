@@ -1,0 +1,55 @@
+---
+name: slide-check
+description: 檢查 Slidev 簡報裡反覆出現的品質問題（爆版、醒目標示行號跑掉、非台灣用語、程式碼範例風格），修正後重新建置。適用於：檢查投影片、slide check、看一下有沒有爆版、簡報 QA、改完投影片幫我檢查。
+argument-hint: "[sharing-YYYYMMDD | 頁碼範圍]"
+---
+
+# Slide Check — 簡報品質檢查
+
+規則本身寫在本 repo `CLAUDE.md` 的「Slide quality checklist」，這份 skill 是照著它實際跑一遍的流程。
+
+## 1. 決定範圍
+
+- 有帶參數就照參數；沒帶就看 `git status` / `git diff --stat`，找出有改動的 `slides/YYYY/sharing-YYYYMMDD/slides.md`
+- 只檢查有改動的頁面，以及它們的前後頁（醒目標示步驟要跟相鄰頁一致）
+- 頁碼：`slides.md` 以 `---` 分頁，第一段 front matter 是第 1 頁
+
+## 2. 開 dev server
+
+```bash
+cd slides/YYYY/sharing-YYYYMMDD && pnpm exec slidev --port 3030
+```
+
+- 用 `run_in_background` 跑；已經在跑就直接用
+- **不要用 `pnpm dev`**：它帶 `--open`，會在使用者的瀏覽器開新視窗搶焦點
+- 用 claude-in-chrome **開一個專用分頁**，不要動使用者既有的分頁
+- 頁面網址 `http://localhost:3030/<頁碼>`，點擊步驟加 `?clicks=<n>`
+
+## 3. 逐頁檢查
+
+| 項目 | 怎麼查 |
+|---|---|
+| 爆版／被切掉 | `javascript_tool` 比對 `.slidev-layout` 內元素的 `scrollHeight`／`scrollWidth` 是否超出容器；表格、雙欄版面、長段落特別看。每個點擊步驟都要查，最後一步最容易爆 |
+| 醒目標示行號 | 對照 ```` ```ts {2-4|6} ```` 這類範圍與程式碼實際行數，確認改完程式碼後沒跑掉；同一段範例出現在相鄰頁時，步驟要一致 |
+| 用語 | 掃中國用語並提出台灣說法：高亮→醒目標示、視頻→影片、默認→預設、信息→資訊、質量→品質、文檔→文件。也標出從英文生硬直譯的句子 |
+| 粗體 | 標出不必要的粗體 |
+| 程式碼範例 | 一律 HTTP API 風格（curl／fetch），不是 SDK 風格 |
+| 圖片 | 有連結的圖片不能出現底線；解析度太低的圖（例如 267x383 這種）要標出來 |
+
+每頁截圖留存，回報時附上有問題的那幾張。
+
+## 4. 修正、重建
+
+- 逐一修正，修完重新檢查同一頁和相鄰頁
+- 用語和措辭的修改，改法不只一種時列出選項給使用者挑，不要自己決定
+- 全部通過後建置單一簡報確認沒壞：`pnpm --filter sharing-YYYYMMDD build`（不要跑根目錄的 `pnpm build`，那會建置所有簡報）
+
+## 5. 回報
+
+輸出一張表：頁碼／問題／修正方式／是否已驗證。最後關掉自己開的 dev server 和分頁。
+
+## ⚠️ 護欄
+
+- 🚫 不 commit，改動留給使用者審閱
+- 🚫 不要碰其他簡報的檔案
+- 一般檔案編輯不需要確認，直接改
